@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar Events Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Calendar Events Manager</h1>
+    <button onclick="displayUpcomingEvents()">Show Upcoming Events</button>
+    <button onclick="deleteEvent('Meeting')">Delete Meeting</button>
+    <button onclick="findMostAttendees()">Find Event with Most Attendees</button>
+    
+    <h2>Upcoming Events</h2>
+    <table id="eventsTable">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Attendees</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        // Array of events
+        const events = [
+            {
+                title: "Meeting",
+                date: new Date("2024-09-25"),
+                location: "Conference Room",
+                attendees: new Set(["Alice", "Bob", "Charlie", "David", "Eve", "Frank"])
+            },
+            {
+                title: "Workshop",
+                date: new Date("2024-09-27"),
+                location: "Online",
+                attendees: new Set(["George", "Hannah", "Ian", "Jack", "Kathy", "Leo"])
+            },
+            {
+                title: "Conference",
+                date: new Date("2024-10-01"),
+                location: "Main Hall",
+                attendees: new Set(["Mona", "Nina", "Owen", "Paul", "Quinn", "Rita"])
+            },
+            {
+                title: "Team Building",
+                date: new Date("2024-10-03"),
+                location: "Outdoors",
+                attendees: new Set(["Steve", "Tina", "Uma", "Vera", "Will", "Xena"])
+            },
+            {
+                title: "Project Review",
+                date: new Date("2024-10-05"),
+                location: "Board Room",
+                attendees: new Set(["Yara", "Zane", "Alfred", "Bella", "Cathy", "Diana"])
+            },
+        ];
+
+        // WeakMap to store event organizers
+        const organizers = new WeakMap();
+        organizers.set("Meeting", "John Doe");
+        organizers.set("Workshop", "Jane Smith");
+        organizers.set("Conference", "Jim Brown");
+        organizers.set("Team Building", "Sara White");
+        organizers.set("Project Review", "Mark Green");
+
+        // Function to display upcoming events
+        function displayUpcomingEvents() {
+            const today = new Date();
+            const nextWeek = new Date(today);
+            nextWeek.setDate(today.getDate() + 7);
+            const upcomingEvents = events.filter(event => event.date >= today && event.date <= nextWeek);
+
+            const tbody = document.getElementById('eventsTable').getElementsByTagName('tbody')[0];
+            tbody.innerHTML = ""; // Clear previous results
+
+            upcomingEvents.forEach(({ title, date, location, attendees }) => {
+                const row = tbody.insertRow();
+                const cellTitle = row.insertCell(0);
+                const cellDate = row.insertCell(1);
+                const cellLocation = row.insertCell(2);
+                const cellAttendees = row.insertCell(3);
+
+                cellTitle.textContent = title;
+                cellDate.textContent = date.toLocaleDateString("en-US");
+                cellLocation.textContent = location;
+                cellAttendees.textContent = Array.from(attendees).join(", ");
+            });
+        }
+
+        // Function to delete an event
+        function deleteEvent(title) {
+            const index = events.findIndex(event => event.title === title);
+            if (index !== -1) {
+                events.splice(index, 1);
+                console.log(`Deleted event: ${title}`);
+                displayUpcomingEvents(); // Refresh display
+            } else {
+                console.log(`Event not found: ${title}`);
+            }
+        }
+
+        // Function to find the event with the most attendees
+        function findMostAttendees() {
+            const mostAttendeesEvent = events.reduce((prev, current) => {
+                return (prev.attendees.size > current.attendees.size) ? prev : current;
+            });
+
+            const attendeesCount = mostAttendeesEvent.attendees.size;
+            console.log(`Event with most attendees: ${mostAttendeesEvent.title} (${attendeesCount} attendees)`);
+            alert(`Event with most attendees: ${mostAttendeesEvent.title}\nAttendees: ${attendeesCount}`);
+        }
+
+        // Convert events to JSON with formatted date
+        const jsonString = JSON.stringify(events, (key, value) => {
+            if (key === "date") {
+                return value.toLocaleDateString("en-US");
+            }
+            return value;
+        });
+        console.log("JSON String:", jsonString);
+
+        // Display properties and values of the first event
+        const firstEvent = events[0];
+        console.log("First Event Properties:", Object.keys(firstEvent));
+        console.log("First Event Values:", Object.values(firstEvent));
+        console.log("First Event Entries:", Object.entries(firstEvent));
+
+        // Log title and date of each event
+        events.forEach(event => {
+            console.log(`Event: ${event.title}, Date: ${event.date.toLocaleDateString("en-US")}`);
+        });
+
+    </script>
+
+</body>
+</html>
